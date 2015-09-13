@@ -56,30 +56,32 @@ by calling the [EC2 metadata service][ec2-metadata] and passing that as a parame
  
 Then entire docker-entrypoint.sh file looks like this:
 
-    #!/bin/bash
-    
-    set -e
-    
-    # Add elasticsearch as command if needed
-    if [ "${1:0:1}" = '-' ]; then
-            set -- elasticsearch "$@"
-    fi
-    
-    # Drop root privileges if we are running elasticsearch
-    if [ "$1" = 'elasticsearch' ]; then
-            # Change the ownership of /usr/share/elasticsearch/data to elasticsearch
-            chown -R elasticsearch:elasticsearch /usr/share/elasticsearch/data
-            exec gosu elasticsearch "$@"
-    fi
-    
-    # ECS will report the docker interface without help, so we override that with host's private ip
-    AWS_PRIVATE_IP=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
-    set -- "$@" --network.publish_host=$AWS_PRIVATE_IP
-    
-    # As argument is not related to elasticsearch,
-    # then assume that user wants to run his own process,
-    # for example a `bash` shell to explore this image
-    exec "$@"
+{% highlight bash %}
+#!/bin/bash
+
+set -e
+
+# Add elasticsearch as command if needed
+if [ "${1:0:1}" = '-' ]; then
+        set -- elasticsearch "$@"
+fi
+
+# Drop root privileges if we are running elasticsearch
+if [ "$1" = 'elasticsearch' ]; then
+        # Change the ownership of /usr/share/elasticsearch/data to elasticsearch
+        chown -R elasticsearch:elasticsearch /usr/share/elasticsearch/data
+        exec gosu elasticsearch "$@"
+fi
+
+# ECS will report the docker interface without help, so we override that with host's private ip
+AWS_PRIVATE_IP=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
+set -- "$@" --network.publish_host=$AWS_PRIVATE_IP
+
+# As argument is not related to elasticsearch,
+# then assume that user wants to run his own process,
+# for example a `bash` shell to explore this image
+exec "$@"
+{% endhighlight %}
 
 Most of that is just copied from the official elasticsearch image. Here's what we added:
 
@@ -126,11 +128,13 @@ array syntax to specify each component separately and to do that, we need to edi
 the JSON-formatted task definition. To do that, just click "Add" to close the container edit dialog, then 
 click the "JSON" tab. Scroll down to the "command" section and set it to something like this:
  
-    "command": [
-        "/docker-entrypoint.sh",
-        "--discovery.type=ec2",
-        "--discovery.ec2.groups=sg-XXXXXXXX"
-    ],
+{% highlight json %}
+"command": [
+    "/docker-entrypoint.sh",
+    "--discovery.type=ec2",
+    "--discovery.ec2.groups=sg-XXXXXXXX"
+],
+{% endhighlight %}
 
 Click "Create" and you now have an ECS Task definition that is ready for deploy!
 
@@ -162,19 +166,21 @@ time.
 Now grab the endpoint for your load balancer and open it up in your browser. You should see a status 
 response similar to this:
  
-    {
-      "status" : 200,
-      "name" : "Virako",
-      "cluster_name" : "elasticsearch",
-      "version" : {
-        "number" : "1.7.1",
-        "build_hash" : "b88f43fc40b0bcd7f173a1f9ee2e97816de80b19",
-        "build_timestamp" : "2015-07-29T09:54:16Z",
-        "build_snapshot" : false,
-        "lucene_version" : "4.10.4"
-      },
-      "tagline" : "You Know, for Search"
-    }
+{% highlight json %}
+{
+  "status" : 200,
+  "name" : "Virako",
+  "cluster_name" : "elasticsearch",
+  "version" : {
+    "number" : "1.7.1",
+    "build_hash" : "b88f43fc40b0bcd7f173a1f9ee2e97816de80b19",
+    "build_timestamp" : "2015-07-29T09:54:16Z",
+    "build_snapshot" : false,
+    "lucene_version" : "4.10.4"
+  },
+  "tagline" : "You Know, for Search"
+}
+{% endhighlight %}
 
 If you see that, you know you've got at least one node up. If not, check your firewall rules. Check ECS to 
 make sure the nodes actually deployed. You can also ssh into one of the instances and use `docker ps -a` to
