@@ -2,7 +2,7 @@
 layout: post
 title:  "AWS Elastic Container Service"
 date:   2015-09-10 08:30:00
-categories: DevOps AWS
+tags:   DevOps AWS CoreOS Docker
 ---
 About a year ago I was visiting a friend of mine who is a software developer. We talked about kids, running,
 biking. But, as it often did, the conversation drifted to cool new technologies. He told me about how Gaia

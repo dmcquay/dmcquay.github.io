@@ -2,7 +2,8 @@
 layout: post
 title:  "Running ElasticSearch on Amazon EC2 Container Service"
 date:   2015-09-12 21:01:05
-categories: DebOps AWS ELB
+category: DevOps
+tags:   DevOps AWS ELB Docker
 ---
 ElasticSearch is a search and analytics engine with native support for clustering. This can be a nice fit 
 for deploying with Amazon EC2 Container Service (ECS) since Docker makes it so easy to install and 
