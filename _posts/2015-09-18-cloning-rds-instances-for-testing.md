@@ -13,8 +13,8 @@ uses regular mysqldump under the hood. To sync my staging/test databases nightly
 job on each that would download the latest dump, drop its own database and restore from the dump.
 
 In AWS, database backups and cloning are very well automated and tooled. But they are done at a binary/disk
-level. Generally, this is a good thing, but there are some downsides, which I'll list in a moment. 
-To clone your database in AWS, you'll want to follow these steps:
+level. Generally, this is a good thing, but the cloning process is a tiny bit more involved. To clone your 
+database in AWS, you'll want to follow these steps:
 
 1. Install the AWS command line client
 2. Create a bash script that does the following...
@@ -46,7 +46,7 @@ aws rds describe-db-snapshots \
 ## Delete the existing instance
 
 Your database endpoint is based on the instance name. By giving the new instance the same name as the 
-previous on, your endpoint URI will not change, so you won't have to reconfigure your consuming app(s). But
+previous one, your endpoint URI will not change, so you won't have to reconfigure your consuming app(s). But
 RDS won't allow you to have two instances with the same instance identifier, so we must first delete the 
 existing instance.
   
@@ -70,7 +70,7 @@ Creating the new instance is straightforward at this point. Some notable setting
  
  - No multi AZ so we're not paying for availability we don't need
  - No minor version upgrade. We're going to clobber it every night anyway
- - Mine is in a VPC, so I must tell it was subnet group it should be in
+ - Mine is in not in the default VPC, so I must tell it was subnet group it should be in
 
 {% highlight bash %}
 aws rds restore-db-instance-from-db-snapshot \
@@ -89,6 +89,9 @@ aws rds restore-db-instance-from-db-snapshot \
 Some settings are inherited from the snapshot and can't be changed when you call the 
 restore-db-instance-from-db-snapshot command. You must wait until the instance is created and available and
 then perform a modification operation. In my case, I needed to disable backups.
+
+Always remember the `--apply-immediately` flag or else you'll be waiting until the next maintenance window 
+for your changes to take effect.
 
 {% highlight bash %}
 aws rds modify-db-instance \
