@@ -77,12 +77,26 @@ aws rds restore-db-instance-from-db-snapshot \
     --db-instance-identifier staging \
     --db-snapshot-identifier=$snapshot_id \
     --db-instance-class db.t2.micro \
+    --storage-type standard gp2 \
     --publicly-accessible \
     --no-multi-az \
     --no-auto-minor-version-upgrade \
     --vpc-security-group-ids $security_group \
     --db-subnet-group-name $subnet_group > /dev/null
 {% endhighlight %}
+
+### Choosing your storage settings
+
+Production databases often use Provisioned IOPS. This is a bit expensive for a test environment, but 
+converting between that and other types of storage is slow. This table should help you weigh your options. 
+It assumes your production database is a 100 GB volume with 1000 provisioned IOPS and you're restoring into
+a db.t2.micro instance.
+
+| Storage Type | Code | Monthly Cost | Migration Time |
+|:--- |:--- |:--- |:--- |
+| Provisioned IOPS | io1 | $77.50 | N/A |
+| General Purpose (SSD) | gp2 | $10 | 67 mins |
+| Magnetic | standard | $5 | 87 mins |
 
 ## Modify the new instance
 
@@ -215,12 +229,11 @@ wait-until-deleted $instance_identifier
 echo "Creating new database: $instance_identifier"
 
 # create the new instance
-# this causes HUGE delays since the prod backup is IOPS and is big (100GB)
-# --storage-type standard \
 aws rds restore-db-instance-from-db-snapshot \
     --db-instance-identifier $instance_identifier \
     --db-snapshot-identifier=$snapshot_id \
     --db-instance-class $instance_class \
+    --storage-type standard gp2 \
     --publicly-accessible \
     --no-multi-az \
     --no-auto-minor-version-upgrade \
@@ -260,12 +273,8 @@ But in the case of creating a clone from those snapshots, there are some downsid
  - Scrubbing your data is a pain. If you want to modify the dump, you must first restore a snapshot as 
    described above and then you can use `mysqldump` as you normally would, excluding what you need and 
    scrubbing the plain text output as needed.
- - Most production RDS instances should use provisioned IOPS. To use that, your disk must be at least 100 
-   GB. When you restore a snapshot from that type of instance, you'll inherit those storage attribute. 
-   Converting from provisioned IOPS to standard storage is very slow. In my case I waited an hour and a 
-   half before giving up. I still have to solve that problem. Also, you are left with a 100GB disk. I don't
-   need that much space for my staging environments, so I don't want to pay for it, but I have no choice 
-   since you can't downsize disk size of RDS instances. You can only go up! Grrrr.
+ - Most production RDS instances should use provisioned IOPS. Converting from that to SSD or magnetic is 
+   slow, but if you don't then you have to pay a hefty fee. See price table above.
 
 Be thoughtful about going around snapshots by using `mysqldump` directly against your production instance. 
 This will cause downtime. Snapshots based on production Multi-AZ instances are taken using the hot copy, 
