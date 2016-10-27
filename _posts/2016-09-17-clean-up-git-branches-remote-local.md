@@ -7,9 +7,10 @@ categories: git
 
 # Cleaning up a remote
 
-Before you proceed, you should prune your remote.
+Before you proceed, you should prune your remote and make sure you're in master branch.
 {% highlight bash %}
 git remote prune origin
+git checkout master
 {% endhighlight %}
 
 **Merged Branches - These should all be safe to delete**
