@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Clean Up Git Branches on a Remote"
+title: "Clean Up Git Branches (Remote & Local)"
 date: 2016-09-17
 categories: git
 ---
