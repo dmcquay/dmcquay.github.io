@@ -7,6 +7,11 @@ categories: git
 
 # Cleaning up a remote
 
+Before you proceed, you should prune your remote.
+{% highlight bash %}
+git remote prune origin
+{% endhighlight %}
+
 **Merged Branches - These should all be safe to delete**
 
 {% highlight bash %}
