@@ -34,3 +34,65 @@ TODO
  - Can either option detect when I mock something with the wrong parameters?
 
 Maybe with yarn I won't mind the footprint of babel anymore?
+
+
+Update:
+ - Flow can use comments for annotations so that transpilation is necessary starting with 0.4.
+ - Flow has a weak mode that makes it easier to add to an existing project. It is advised to start here, then add types gradually, then switch to normal mode.
+ - I tried to run flow on narwhal and got a TON of errors on stuff in node_modules and can't find a way to ignore. I only added `// @flow weak` to one file and couldn't get it to test only that one file.
+
+
+What about just using JSDoc?
+ - Will WebStorm read the JSDoc and give us better tooling?
+ - Typescript supposedly will read and use JSDoc. Could we use JSDoc + Typescript as a linter instead of a compiler?
+
+
+{% highlight javascript %}
+/**
+ * Does the awesomeness.
+ *
+ * @param {Object} opts Options
+ * @param {string} opts.name
+ * @param {number} [opts.age]
+ * @returns {{foo:number}}
+ */
+function foo(opts) {
+  return {foo: 6}
+}
+
+/** @type {number} */
+let it = 6
+
+foo({name: 'hello', age: 6})
+{% endhighlight %}
+
+In WebStorm, destructured require syntax interferes with WebStorm's ability to trace the types:
+
+{% highlight javascript %}
+import {doIt} from './foo' // works
+const foo = require('./foo') // works, but you have to call as foo.doIt()
+const {doIt} = require('./foo') // doesn't work
+{% endhighlight %}
+
+Complex types:
+
+{% highlight javascript %}
+/**
+ @typedef {Object} point
+ @property {number} x The x coordinate.
+ @property {number} y The y coordinate.
+ */
+{% endhighlight %}
+
+or shorthand:
+
+{% highlight javascript %}
+/** @typedef {{x:number, y:number}} point */
+{% endhighlight %}
+
+
+
+
+TODO:
+ - Document the use cases where WebStorm can't follow your code (e.g. destructured require statements)
+ - Find a command line checker/linter that does what WebStorm does. Ideally identical. spy-js?
