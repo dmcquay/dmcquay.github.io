@@ -92,6 +92,8 @@ or shorthand:
 
 
 
+eslint will check that the JSDoc params match the actual method params, but probably not smart. Can't say "JSDoc says you should return a string, but you returned an int".
+
 
 TODO:
  - Document the use cases where WebStorm can't follow your code (e.g. destructured require statements)
