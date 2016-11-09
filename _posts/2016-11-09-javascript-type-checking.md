@@ -33,31 +33,6 @@ Ideally, I want the best of both worlds. I think types are super helpful, but I 
  - Makes debugging harder (have to get source maps set up just right, can't just look at plain source)
  - Intermediate step added to just about anything (running code, webpack/gulp stuff, etc)
 
-# Sidebar: Flow vs TypeScript
-
-Useful comparison of Flow and TypeScript
-https://djcordhose.github.io/flow-vs-typescript/2016_hhjs.html#/
-
-TypeScript
- - Always transpilation
- - Also == Close-ish to ES6/7/..., but never perfect. Not ACTUALLY ES6.
- - Can get type checking of 3rd party stuff with d.ts files. It's a pain, but at least it's an option. I think
-   you could skip this by configuring not strict.
-
-Flow
- - Can do some type checking w/out writing any types (no transpilation)
- - Flow can use comments for annotations so that transpilation is necessary starting with 0.4.
- - You can start adding in type assertions, but then you need to transpile (w/ babel)
- - But the transpilation is super simple. Line numbers should match up w/out source maps. Footprint is probably small.
- - Seems like it is not capable of checking 3rd party stuff.
- - How to check complex data types?
- - Does Flow have WebStorm support?
- - Online playground supports Class properties. Not supported by node? Need Babel?
- - Only tests a file if it has the // @flow comment at the top (configurable in .flowconfig?)
- - Flow doesn't let me set properties on a class that weren't defined as class attributes, which Node doesn't support w/out Babel!
- - Flow has a weak mode that makes it easier to add to an existing project. It is advised to start here, then add types gradually, then switch to normal mode.
- - I tried to run flow on an existing project and got a TON of errors on stuff in node_modules and can't find a way to ignore. I only added `// @flow weak` to one file and couldn't get it to test only that one file.
-
 # Enter JSDoc
 
 JSDoc is a classic way to document your JS code and it *almost* provides what I need. It provides the missing metadata that is needed to make my code more type safe and toolable. It provides much more context to consumers of my code. However, JSDoc by itself won't tell you if you passed a string where you should have passed a number. For that you need a tool that will leverage JSDoc to provide type checking.
@@ -115,3 +90,29 @@ or shorthand:
 {% highlight javascript %}
 /** @typedef {% raw %}{{x:number, y:number}}{% endraw %} point */
 {% endhighlight %}
+
+# Sidebar: Flow vs TypeScript
+
+[Useful comparison of Flow and TypeScript](https://djcordhose.github.io/flow-vs-typescript/2016_hhjs.html#/)
+
+TypeScript
+
+ - Always transpilation
+ - Also == Close-ish to ES6/7/..., but never perfect. Not ACTUALLY ES6.
+ - Can get type checking of 3rd party stuff with d.ts files. It's a pain, but at least it's an option. I think
+   you could skip this by configuring not strict.
+
+Flow
+
+ - Can do some type checking w/out writing any types (no transpilation)
+ - Flow can use comments for annotations so that transpilation is necessary starting with 0.4.
+ - You can start adding in type assertions, but then you need to transpile (w/ babel)
+ - But the transpilation is super simple. Line numbers should match up w/out source maps. Footprint is probably small.
+ - Seems like it is not capable of checking 3rd party stuff.
+ - How to check complex data types?
+ - Does Flow have WebStorm support?
+ - Online playground supports Class properties. Not supported by node? Need Babel?
+ - Only tests a file if it has the // @flow comment at the top (configurable in .flowconfig?)
+ - Flow doesn't let me set properties on a class that weren't defined as class attributes, which Node doesn't support w/out Babel!
+ - Flow has a weak mode that makes it easier to add to an existing project. It is advised to start here, then add types gradually, then switch to normal mode.
+ - I tried to run flow on an existing project and got a TON of errors on stuff in node_modules and can't find a way to ignore. I only added `// @flow weak` to one file and couldn't get it to test only that one file.
