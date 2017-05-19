@@ -4,7 +4,6 @@ the heap consists of two chunks of memory (old and new, also called large and sm
 Default max old size is ~1.5 G. Max on 64bit machines is 1.7G. Max on 32bit is 512M.
 You can control max old size with --max_old_space_size=X (in MB)
 
-
 --max_new_space_size (in kBytes) - i think this is old
 
 --max-executable-size the maximum size of heap reserved for executable code (the native code result of just-in-time compiled JavaScript).
