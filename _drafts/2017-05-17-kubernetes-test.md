@@ -58,7 +58,10 @@ Might want this component later: `docker-credential-gcr`
 Connect to cluster by logging into google cloud, clicking "Connect" by your cluster
 Or use minikube and connect to it with "minikube start"
 
-`kubectl create secret generic stage-mysql --from-literal=MYSQL_HOST=104.154.21.59 --from-literal=MYSQL_USER=root --from-literal="MYSQL_PASSWORD=dk4%rkg&kflghwlekfjfklkhqxvHyE8)" --from-literal=MYSQL_DATABASE=pacas_staging --from-literal=MYSQL_CONNECTION_LIMIT=2`
+minikube start
+minikube dashboard
+
+`kubectl create secret generic stage-mysql --from-literal="MYSQL_PASSWORD=<password>"`
 
 create a deployment.yaml file
 
@@ -67,3 +70,9 @@ create a deployment from that file: `kubectl create -f deployment.yaml`
 update the deployment: `kubectl replace -f deployment.yaml`
 
 check status of a deployment: `kubectl rollout status deployment/pacas-api-deployment`
+
+expose it: `kubectl expose deployment/pacas-api-deployment --type="NodePort" --port 80`
+
+list pods by label: `kubectl get pods -l app=api`
+
+check if the service is running before it is exposed: `kubectl exec -it pacas-api-deployment-2008014165-2d3k6 curl localhost:3000`

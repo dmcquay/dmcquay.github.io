@@ -1,4 +1,5 @@
 Brainstorm
+
 - NewRelic APM Apdex alerting: works, but is not specific to each endpoint, so it takes a bigger change to make the whole app alert
 - NewRelic Synthetics: Requires you to do work for every endpoint. Also, I don't think it will work when auth or any state (cookie/header) is required.
 - NewRelic Key Transactions: Requires you to do work for every endpoint, but should otherwise work well. Alert based on endpoint specific Apdex or a custom defined response time.

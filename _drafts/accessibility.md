@@ -1,4 +1,0 @@
-- section 508 (goverment guidelines) - old, but getting upgraded, will encompass wcag 2.0
-- wcag 2.0 from w3c (so best to just focus on this)
-- 3 levels in wcag 2.0: a, aa, aaa
-- aa: probably what we should shoot for
