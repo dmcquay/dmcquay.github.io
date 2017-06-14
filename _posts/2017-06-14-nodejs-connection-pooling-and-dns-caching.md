@@ -1,8 +1,15 @@
+---
+layout: post
+title: "NodeJS Connection Pooling and DNS Caching"
+date: 2017-06-14
+categories: Optimization
+---
+
 The following potential concerns came up in my workplace recently, so I decided to investigate them.
 
 
-- Node.js does not cache DNS responses
-- Node.js does not maintain connections to servers
+Node.js does not cache DNS responses
+Node.js does not maintain connections to servers
 
 
 # DNS Caching
@@ -14,7 +21,7 @@ npm module "dnscache"
 what i care about is resolving internal.pluralsight.com
 dig internal.pluralsight.com from one of our production hosts reported 0 ms!
 
-{% highlight javascript %}
+```js
 const axios = require('axios')
 let promise = Promise.resolve()
 for (let i = 1; i <= 20; i++) {
@@ -23,30 +30,32 @@ for (let i = 1; i <= 20; i++) {
                 .then(() => axios.get('http://internal.pluralsight.com/learner/content/health-check'))
                 .then(() => console.timeEnd(`request ${i}`))
 }
-{% endhighlight %}
+```
 
 From my laptop:
 
-- request 1: 120.827ms
-- request 2: 107.699ms
-- request 3: 99.480ms
-- request 4: 100.942ms
-- request 5: 103.330ms
-- request 6: 162.918ms
-- request 7: 115.165ms
-- request 8: 101.771ms
-- request 9: 100.638ms
-- request 10: 99.298ms
-- request 11: 102.911ms
-- request 12: 102.551ms
-- request 13: 103.913ms
-- request 14: 103.288ms
-- request 15: 102.118ms
-- request 16: 168.192ms
-- request 17: 100.394ms
-- request 18: 99.501ms
-- request 19: 103.233ms
-- request 20: 101.774ms
+```
+request 1: 120.827ms
+request 2: 107.699ms
+request 3: 99.480ms
+request 4: 100.942ms
+request 5: 103.330ms
+request 6: 162.918ms
+request 7: 115.165ms
+request 8: 101.771ms
+request 9: 100.638ms
+request 10: 99.298ms
+request 11: 102.911ms
+request 12: 102.551ms
+request 13: 103.913ms
+request 14: 103.288ms
+request 15: 102.118ms
+request 16: 168.192ms
+request 17: 100.394ms
+request 18: 99.501ms
+request 19: 103.233ms
+request 20: 101.774ms
+```
 
 From a production server:
 
@@ -75,7 +84,7 @@ request 20: 7.429ms
 
 After introducing a 1 second delay between requests (to expire TTL if present):
 
-{% highlight javascript %}
+```js
 const axios = require('axios')
 let promise = Promise.resolve()
 for (let i = 1; i <= 20; i++) {
@@ -85,8 +94,9 @@ for (let i = 1; i <= 20; i++) {
                 .then(() => axios.get('http://internal.pluralsight.com/learner/content/health-check'))
                 .then(() => console.timeEnd(`request ${i}`))
 }
-{% endhighlight %}
+```
 
+```
 request 1: 25.890ms
 request 2: 12.366ms
 request 3: 5.543ms
@@ -107,10 +117,11 @@ request 17: 17.804ms
 request 18: 7.379ms
 request 19: 15.028ms
 request 20: 9.069ms
+```
 
 Let's try hitting an IP directly:
 
-{% highlight javascript %}
+```js
 const axios = require('axios')
 let promise = Promise.resolve()
 for (let i = 1; i <= 20; i++) {
@@ -119,7 +130,7 @@ for (let i = 1; i <= 20; i++) {
                 .then(() => axios.get('http://10.107.148.199/learner/content/health-check'))
                 .then(() => console.timeEnd(`request ${i}`))
 }
-{% endhighlight %}
+```
 
 
 
