@@ -8,18 +8,18 @@ categories: Optimization
 The following potential concerns came up in my workplace recently, so I decided to investigate them.
 
 
-Node.js does not cache DNS responses
-Node.js does not maintain connections to servers
+- Node.js does not cache DNS responses
+- Node.js does not maintain connections to servers
 
 
 # DNS Caching
 
-http://www.madhur.co.in/blog/2016/05/28/nodejs-dns-cache.html
-dig facebook.com only takes 31 ms for me, but it does take < 1 ms subsequent times
-30 extra ms per request IS significant for our prod apps
-npm module "dnscache"
-what i care about is resolving internal.pluralsight.com
-dig internal.pluralsight.com from one of our production hosts reported 0 ms!
+- http://www.madhur.co.in/blog/2016/05/28/nodejs-dns-cache.html
+- dig facebook.com only takes 31 ms for me, but it does take < 1 ms subsequent times
+- 30 extra ms per request IS significant for our prod apps
+- npm module "dnscache"
+- what i care about is resolving internal.pluralsight.com
+- dig internal.pluralsight.com from one of our production hosts reported 0 ms!
 
 ```js
 const axios = require('axios')
@@ -136,8 +136,8 @@ for (let i = 1; i <= 20; i++) {
 
 # Request Connection Pooling
 
-https://stackoverflow.com/questions/17375021/how-to-manage-node-js-request-connection-pool
-https://nodejs.org/api/http.html#http_class_http_agent
+- https://stackoverflow.com/questions/17375021/how-to-manage-node-js-request-connection-pool
+- https://nodejs.org/api/http.html#http_class_http_agent
 
 Looks to me like node DOES support connection pooling. But by default, only if there are pending requests to that host. You have to set keepAlive: true in a custom agent to keep it open indefinitely.
 
