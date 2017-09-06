@@ -61,3 +61,14 @@ JSONStream will take care of all of this for us.
 
 - Low memory footprint
 - Slower!
+
+What? Slower? Yes, by a lot. I was using compress middleware for express and I noticed that streaming the response data prevented that middleware from working. My time to last byte for local requests when from ~3s to ~10s. I enabled compression by manually piping through a zlib stream like this:
+
+```
+const zlib = require('zlib')
+const z = zlib.createGzip()
+res.set('Content-Encoding', 'gzip')
+streamOfObjects.pipe(JSONStream.stringify()).pipe(z).pipe(res)
+```
+
+This made the response once again gzipped and brought the time to last byte down to ~4.2s. Must better, but still slower than the original.
