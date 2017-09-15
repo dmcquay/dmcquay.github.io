@@ -1,3 +1,9 @@
+---
+layout: post
+title:  "Synchros Restarts with SystemD Notify and NodeJS"
+category: DevOps
+tags:   DevOps
+---
 My team uses systemd. When systemd starts a process, it needs to know if the process started successfully. The most simple way to do this is for systemd to wait for a bit after starting the process (perhaps 10 seconds) and simply check that the process is still running. Since you generally can't predict exactly how long your service will take to successfully start up, this is error prone. Furthermore, this method is slow. If you are doing synchronous restarts for a rolling deploy, this adds a lot of time.
 
 There is a better way called systemd-notify. Basically what happens is that your process uses IPC (inter-process communication) to tell systemd when it is up. Systemd provides a C library to accomplish this.
@@ -69,7 +75,16 @@ sendmsg(3, {msg_name={sa_family=AF_UNIX, sun_path="/run/systemd/notify"}, msg_na
 
 Here we can see the socket is opened and sent the message "READY=1". That's it! We were feeling hopeful. All we had to do was figure out how to open a unix domain socket and send the text "READY=1" to it.
 
-Our first attempt was using `net.connect`. It is capable of connecting to unix domain sockets. However, we got the error EPROTOCOLERR (TODO: double check this error). To get a little more color on this, we decided to run `strace` on our nodejs script and compare it to the python script. Doing this, we found that python was opening the socket with `socket(AF_UNIX, SOCK_DGRAM|SOCK_CLOEXEC, 0) = 3` and node was opening it with `socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, 0) = 10`.
+Our first attempt was using `net.connect`. It is capable of connecting to unix domain sockets. The code is something like this:
+
+{% highlight javascript %}
+const net = require('net')
+const client = net.connect('/tmp/echo.sock', () => {
+  client.write('i wrote something')
+})
+{% endhighlight %}
+
+Doing this failed with EPROTOCOLERR (TODO: double check this error). To get a little more color on this, we decided to run `strace` on our nodejs script and compare it to the python script. Doing this, we found that python was opening the socket with `socket(AF_UNIX, SOCK_DGRAM|SOCK_CLOEXEC, 0) = 3` and node was opening it with `socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, 0) = 10`.
 
 So node was using a stream mode of some sort and python was using a datagram mode.
 
