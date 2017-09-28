@@ -39,7 +39,9 @@ To solve this, `systemd-notify` just needs to sleep for a tiny bit to give `sd-b
 
 Python has a module that calls `systemd-notify` so you can write a little python one liner and shell out to it instead of `systemd-notify`. The reason this works is because you can add a short sleep to your python script to solve the race condition.
 
-TODO: provide the python one liner here
+```
+exec('python -c "import systemd.daemon, time; systemd.daemon.notify(\'READY=1\'); time.sleep(15)"')
+```
 
 ## A Better Solution?
 
@@ -84,7 +86,7 @@ const client = net.connect('/tmp/echo.sock', () => {
 })
 {% endhighlight %}
 
-Doing this failed with EPROTOCOLERR (TODO: double check this error). To get a little more color on this, we decided to run `strace` on our nodejs script and compare it to the python script. Doing this, we found that python was opening the socket with `socket(AF_UNIX, SOCK_DGRAM|SOCK_CLOEXEC, 0) = 3` and node was opening it with `socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, 0) = 10`.
+Doing this failed with EPROTOCOLERR . To get a little more color on this, we decided to run `strace` on our nodejs script and compare it to the python script. Doing this, we found that python was opening the socket with `socket(AF_UNIX, SOCK_DGRAM|SOCK_CLOEXEC, 0) = 3` and node was opening it with `socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, 0) = 10`.
 
 So node was using a stream mode of some sort and python was using a datagram mode.
 
