@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Synchros Restarts with SystemD Notify and NodeJS"
+title:  "Synchronous Restarts with SystemD Notify and NodeJS"
 category: DevOps
 tags:   DevOps
 ---
