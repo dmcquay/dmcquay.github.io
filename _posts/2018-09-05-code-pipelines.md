@@ -30,7 +30,7 @@ In your coordinator functions, only two things should happen:
 1. Call a stateless function that does some kind of transform.
 2. Call a stateful function (such as a DB query) and then check if it failed.
 
-```
+{% highlight javascript %}
 function coordinatorFunction(props) {
     const queryCommand1 = buildQueryCommand1(props); // stateless transform
     const result1 = executeQuery(queryCommand); // stateful operation (I/O)
@@ -67,13 +67,13 @@ function httpRoute(req, res) {
         res.body = getPayload(result);
     }
 }
-```
+{% endhighlight %}
 
 ## Maximize stateless functions by isolating I/O
 
 We often mix business logic with I/O or other stateful functions. Because of this, the business logic is harder to test. Here's an example:
 
-```
+{% highlight javascript %}
 function getTransactions(accountId) {
     const sql = 'SELECT * FROM transactions WHERE account_id = $1';
     const result = await db.query(sql, [accountId]);
@@ -85,7 +85,7 @@ function getTransactions(accountId) {
         };
     });
 }
-```
+{% endhighlight %}
 
 We are really doing three things here:
 
@@ -95,7 +95,7 @@ We are really doing three things here:
 
 Items 1 and 3 are very easy to test if they were not coupled with 2. Let's change that.
 
-```
+{% highlight javascript %}
 // This is now our coordinator function.
 function getTransactions(accountId) {
     const command = buildSelectionTransactionsCommand(accountId);
@@ -126,7 +126,7 @@ function buildTransactionDtoFromDbRow(row) {
         createdAt: row.created_at
     };
 }
-```
+{% endhighlight %}
 
 Now `buildSelectTransactionsCommand` and `buildTransactionDtoFromDbRow` are separated from the I/O and can easily be tested.
 
@@ -146,7 +146,7 @@ You can see an example of this in our previous getTransactions example. In `db.q
 
 Let's look at another example. It is like our previous example, but we are going to provide a default value for foo in our DTO builder. We are wondering how often this happens so we are going to log each time it does.
 
-```
+{% highlight javascript %}
 function getTransactions(accountId) {
     // ...
     const dtos = rows.map(buildTransactionDtoFromDbRow);
@@ -165,11 +165,11 @@ function buildTransactionDtoFromDbRow(row) {
         foo: row.foo || 'default foo value'
     };
 }
-```
+{% endhighlight %}
 
 Let's pull the logging out of `buildTransactionDtoFromDbRow`. 
 
-```
+{% highlight javascript %}
 function getTransactions(accountId) {
     // ...
     const fooUndefinedCount = countTransactionRowsWhereFooIsUndefined(rows)
@@ -193,7 +193,7 @@ function buildTransactionDtoFromDbRow(row) {
         foo: row.foo || 'default foo value'
     };
 }
-```
+{% endhighlight %}
 
 ## Creatively avoid special handling of edge cases
 
@@ -217,7 +217,7 @@ Before heading down this route, consider a few things.
 
 With those warnings aside, here's an example pipe implementation. It doesn't do any monitoring yet, but it does handle logging and short circuiting. You can probably imagine how monitoring could be added without much trouble.
 
-```
+{% highlight javascript %}
 export const pipe = R.curry(
   (opts: { logError?: Function }, fns: Function[]) => {
     const { logError = () => {} } = opts;
@@ -241,13 +241,13 @@ export const pipe = R.curry(
     };
   }
 );
-```
+{% endhighlight %}
 
 Pipe assumes that the result of each function will get passed into the next function. Thefore you might make each function accept and return a context object that can accumulate state (depending on your needs). This means that every function has to conform to this, which can be annoying.
 
 To make this situation a bit better, I created this function:
 
-```
+{% highlight javascript %}
 export function mapContext(fn, inputProp, outputProp) {
   return async ctx => {
     const result = await fn(inputProp ? ctx[inputProp] : ctx);
@@ -263,7 +263,7 @@ export function mapContext(fn, inputProp, outputProp) {
     return mappedResult;
   };
 }
-```
+{% endhighlight %}
 
 It allows you to take a value from your context object and use it as an argument to your function and map the result of that function back into the context object. This way you can put functions unaware of this context into your pipe.
 
@@ -271,18 +271,18 @@ The last problem I ran into with pipe's handling of failables. It never passes f
 
 It is trivial, but here is a utility to wrap the failable for you in this case.
 
-```
+{% highlight javascript %}
 export function catchFailable(fn) {
   return async (...args) => {
     const result = await fn(...args);
     return success(result);
   };
 }
-```
+{% endhighlight %}
 
 And finally, here is a coordinator function that uses all these utilities.
 
-```
+{% highlight javascript %}
 const buildCoordinator = pipe({
   logError: logger.error.bind(logger)
 });
@@ -305,7 +305,7 @@ export const createUpvote = buildCoordinator([
   mapContext(db.query, "fetchUpvoteCmd", "existingUpvoteQueryResult"),
   buildCreateUpvoteResult
 ]);
-```
+{% endhighlight %}
 
 After writing this, I think it would be best to use wrap only in cases where the function being wrapped is not specific to our coordinator. In cases where the function wrapped is specific to the coordinator, we might as well just make that function aware of the context and avoid the mental overhead caused by the wrapper.
 
