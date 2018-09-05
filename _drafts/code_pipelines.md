@@ -12,5 +12,7 @@ But we wondered if there was a better way? Was there a different approach where 
 - Logging and monitoring are impure
 - Creatively avoid special handling of edge cases
 - How to test your coordination functions
+- Runtime abstration
+- Team master and ownership > clever code
 
 [1] This is a rough estimate from my recollection. I did not take the time to do a code analysis for this post.
