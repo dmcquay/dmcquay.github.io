@@ -14,5 +14,6 @@ But we wondered if there was a better way? Was there a different approach where 
 - How to test your coordination functions
 - Runtime abstration
 - Team master and ownership > clever code
+- Decouple from protocol (e.g. HTTP)
 
 [1] This is a rough estimate from my recollection. I did not take the time to do a code analysis for this post.
