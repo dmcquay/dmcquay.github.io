@@ -16,7 +16,7 @@ But we wondered if there was a better way? Was there a different approach where 
 - Structure code as pipelines instead of hierarchies
 - Maximize stateless functions by isolating I/O
 - Return errors as values
-- Logging and monitoring are impure
+- Logging and monitoring are stateful
 - Creatively avoid special handling of edge cases
 - How to test your coordination functions
 - Creating a runtime
@@ -138,7 +138,7 @@ Throwing errors is convenient because you can choose to ignore errors and "catch
 
 A major reason for the first principle **Structure code as pipelines instead of hierarchies** is so that there are no surprises. We don't want surprising state manipulations to happen one or more layers beneath us. We want all such manipulations to happen in plain sight within the coordinator function. The same goes for errors. By returning a container, such as a Failable, from any operation that can fail (such as I/O), we have to explicitly check if it worked and extract the payload from it only in the success case.
 
-## Logging and monitoring are impure
+## Logging and monitoring are stateful
 
 Logging and monitoring calls are stateful and should be called from your coordinator function just like any other I/O. Don't litter your code with logging statements. If you want to log something in one of your transforms or I/O, instead return any context needed in your return value and then log in your coordinator.
 
